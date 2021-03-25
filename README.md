@@ -20,6 +20,10 @@ https://etherscan.io/apis#contracts，etherscan提供的开源合约源代码的
 
 访问api需要api key，申请开发者后在个人信息中获取
 
+### 使用方法
+
+设置代理，填充api key，更新contract-address-list，然后直接运行
+
 ------
 
 **English description is translated by Google Translator** 
@@ -48,4 +52,6 @@ Due to the relationship of the wall, I set up a proxy, please delete it if you d
 
 api key is required to access api, which can be obtained from personal information after applying for developer.
 
+### Instructions
 
+Set up the proxy, fill in the api key, update the contract-address-list, and then run ContractsCollector.go directly
