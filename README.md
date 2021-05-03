@@ -50,4 +50,4 @@ storage_dir 是下载到的合约代码存储路径
 
 ### 示例
 
-![image-20210503225928991](README.assets\image-20210503225928991.png)
+![image-20210503225928991](README.assets/image-20210503225928991.png)
