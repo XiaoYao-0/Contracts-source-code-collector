@@ -148,9 +148,3 @@ func GetOneContract(name string, address string) {
 	}
 	return
 }
-
-func main() {
-	GetSomeContracts()
-	GetOneContract("HypeArt", "0xb3307dca37a2b71df435a9789a7a98e2cb52f6f7")
-	GetContractsByList("contract-address-list.csv")
-}

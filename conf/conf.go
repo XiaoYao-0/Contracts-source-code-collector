@@ -15,7 +15,7 @@ type conf struct {
 
 func getConf() (conf, error) {
 	var conf conf
-	file, err := os.Open("conf/conf.json")
+	file, err := os.Open("conf.json")
 	if err != nil {
 		return conf, errors.New("conf.json not found")
 	}
@@ -39,7 +39,7 @@ func ContractNumber() (int, error) {
 
 func SetContractNumber(num int) error {
 	var conf conf
-	file, err := os.Open("conf/conf.json")
+	file, err := os.Open("conf.json")
 
 	if err != nil {
 		return errors.New("conf.json not found")
@@ -50,8 +50,8 @@ func SetContractNumber(num int) error {
 		return errors.New("unresolved conf.json")
 	}
 	file.Close()
-	os.Truncate("conf/conf.json", 0)
-	file, err = os.OpenFile("conf/conf.json", os.O_APPEND, 0644)
+	os.Truncate("conf.json", 0)
+	file, err = os.OpenFile("conf.json", os.O_APPEND, 0644)
 	conf.ContractNumber = num
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(&conf)
