@@ -28,6 +28,11 @@ func cmdExample() {
 	return
 }
 
+func cmdERC20Token() {
+	GetTopERC20Tokens()
+	return
+}
+
 func main() {
 	mode := flag.String("m", "", "mode:"+
 		"\n'single': get one contract by name and address, require \"-n\"(name) and \"-a\"(address)"+
@@ -39,7 +44,8 @@ func main() {
 		"\n\"0x6b734835970ca79853a105a82ecfe607ed4a3330719201785847489438783036\",\"0x0cd75d7b8fb785f186165bdc280489ea750bad17\",\"Token\""+
 		"\n\"0x0190ac3ae873c41f7ef08a474789a01fa9947f5c5094668f674c5566868275c9\",\"0xb9b5bea373074b869b721c1cb38cc837f1b061b5\",\"LOCG\""+
 		"\n\"0x81c84e3904e1d324eb9c5110576515a1394a3e665ac1373741b2c17c459416cb\",\"0xced0b3b9f30f12332c77ad937d6137ce94162d9d\",\"VEAN\""+
-		"\n'example': get example contracts list from etherscan, require nothing")
+		"\n'example': get example contracts list from etherscan, require nothing"+
+		"\n'ERC20': get top ERC20 Token address list, require nothing")
 	name := flag.String("n", "", "name: contract name")
 	address := flag.String("a", "", "address: contract address")
 	filepath := flag.String("f", "contract-address-list.csv", "filepath: contract list filepath")
@@ -51,6 +57,8 @@ func main() {
 		cmdMulti(*filepath)
 	case "example":
 		cmdExample()
+	case "ERC20":
+		cmdERC20Token()
 	default:
 		flag.Usage()
 	}

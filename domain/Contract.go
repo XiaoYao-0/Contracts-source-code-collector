@@ -49,7 +49,7 @@ func (contract *Contract) Collect() {
 	}
 	err := contract.ContractRepo.Collect(contract)
 	if err != nil {
-		contract.Error = errors.New("storage failure")
+		contract.Error = errors.New("collect failure")
 	}
 	return
 }

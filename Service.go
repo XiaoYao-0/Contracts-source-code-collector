@@ -105,7 +105,7 @@ func commonGetContracts(filepath string) error {
 	return nil
 }
 
-// Get your own list of contracts
+// GetContractsByList Get your own list of contracts
 func GetContractsByList(filepath string) {
 	err := commonGetContracts(filepath)
 	if err != nil {
@@ -114,12 +114,12 @@ func GetContractsByList(filepath string) {
 	return
 }
 
-// Get default list of contracts from etherscan
+// GetSomeContracts Get default list of contracts from etherscan
 func GetSomeContracts() {
 	fmt.Println("Please try to download contracts list from https://etherscan.io/exportData?type=open-source-contract-codes")
 }
 
-// Get one contract
+// GetOneContract Get one contract
 func GetOneContract(name string, address string) {
 	fmt.Println("Init...")
 	err := Init()
@@ -146,5 +146,19 @@ func GetOneContract(name string, address string) {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
+	return
+}
+
+func GetTopERC20Tokens() {
+	fmt.Println("Init...")
+	contractList, err := dal.CollectERC20TokenList()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	err = dal.SaveContractList(contractList, "ERC20Token.csv")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("Successfully get ERC20Token-address-list, filename: ERC20Token.csv")
 	return
 }

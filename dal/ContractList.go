@@ -9,7 +9,9 @@ import (
 	"strings"
 )
 
-// Read contracts-list
+const ContractListStart = "Note: For the actual contract source codes use the api endpoints at https://etherscan.io/apis#contracts\n\"Txhash\",\"ContractAddress\",\"ContractName\"\n"
+
+// GetContracts Read contracts-list
 func GetContracts(filepath string) ([]*domain.Contract, error) {
 	var contracts []*domain.Contract
 	f, err := os.Open(filepath)
@@ -35,7 +37,7 @@ func GetContracts(filepath string) ([]*domain.Contract, error) {
 func phaseContract(s string) *domain.Contract {
 	var contract domain.Contract
 	s = strings.ReplaceAll(s, "\"", "")
-	if !strings.HasPrefix(s, "0x") {
+	if !strings.Contains(s, "0x") {
 		contract.Error = errors.New("non-contract")
 		return &contract
 	}
@@ -64,4 +66,28 @@ func isValid(address string) bool {
 		return false
 	}
 	return true
+}
+
+func SaveContractList(contracts []*domain.Contract, filename string) error {
+	if len(contracts) == 0 {
+		return errors.New("no contract found")
+	}
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	f.Close()
+	fileAppend(filename, ContractListStart)
+	for _, contract := range contracts {
+		line := ",\"" + contract.Address + "\",\"" + contract.Name + "\"\n"
+		fileAppend(filename, line)
+	}
+	return nil
+}
+
+func fileAppend(filepath, content string) {
+	f, _ := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, os.ModePerm)
+	defer f.Close()
+	data := []byte(content)
+	f.Write(data)
 }

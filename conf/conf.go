@@ -52,6 +52,9 @@ func SetContractNumber(num int) error {
 	file.Close()
 	os.Truncate("conf.json", 0)
 	file, err = os.OpenFile("conf.json", os.O_APPEND, 0644)
+	if err != nil {
+		return errors.New("open conf.json failure")
+	}
 	conf.ContractNumber = num
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(&conf)
