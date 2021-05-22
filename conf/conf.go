@@ -3,6 +3,7 @@ package conf
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -51,7 +52,7 @@ func SetContractNumber(num int) error {
 	}
 	file.Close()
 	os.Truncate("conf.json", 0)
-	file, err = os.OpenFile("conf.json", os.O_APPEND, 0644)
+	file, err = os.OpenFile("conf.json", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		return errors.New("open conf.json failure")
 	}
@@ -59,6 +60,8 @@ func SetContractNumber(num int) error {
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(&conf)
 	if err != nil {
+		fmt.Println(conf)
+		fmt.Println(err)
 		return errors.New("write conf.json failure")
 	}
 	return nil
