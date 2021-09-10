@@ -6,8 +6,10 @@ import (
 	"github.com/XiaoYao-0/Contracts-source-code-collector/conf"
 	"github.com/XiaoYao-0/Contracts-source-code-collector/dal"
 	"github.com/XiaoYao-0/Contracts-source-code-collector/domain"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func Init() error {
@@ -110,6 +112,7 @@ func GetContractsByList(filepath string) {
 	err := commonGetContracts(filepath)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
 	return
 }
@@ -125,10 +128,12 @@ func GetOneContract(name string, address string) {
 	err := Init()
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
 	number, err := conf.ContractNumber()
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
 	var contract domain.Contract
 	contract.Number = number
@@ -145,6 +150,7 @@ func GetOneContract(name string, address string) {
 	err = conf.SetContractNumber(number)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
 	return
 }
@@ -154,11 +160,69 @@ func GetTopERC20Tokens() {
 	contractList, err := dal.CollectERC20TokenList()
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
+	fmt.Println("Successfully get ERC20Token-address-list, saving...")
 	err = dal.SaveContractList(contractList, "ERC20Token.csv")
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
-	fmt.Println("Successfully get ERC20Token-address-list, filename: ERC20Token.csv")
+	fmt.Println("Successfully save ERC20Token-address-list, filename: ERC20Token.csv")
 	return
+}
+
+func GetTopERC721Tokens() {
+	fmt.Println("Init...")
+	contractList, err := dal.CollectERC721TokenList()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Successfully get ERC721Token-address-list, saving...")
+	err = dal.SaveContractList(contractList, "ERC721Token.csv")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Successfully save ERC721Token-address-list, filename: ERC721Token.csv")
+	return
+}
+
+func VerifyBalanceOfInERC721Tokens(dir string) {
+	fmt.Println("Init...")
+
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	for _, file := range files {
+		if file.IsDir() {
+			files1, err := ioutil.ReadDir(fmt.Sprintf("%v/%v", dir, file.Name()))
+			if err != nil {
+				fmt.Println("Error:", err)
+				return
+			}
+			if len(files1) != 1 {
+				fmt.Printf("Warning: %v has multi sols\n", file.Name())
+				continue
+			}
+			file1 := files1[0]
+			bytes, _ := ioutil.ReadFile(fmt.Sprintf("%v/%v/%v", dir, file.Name(), file1.Name()))
+			solCode := string(bytes)
+			res := verifyBalanceOfInOneERC721Token(solCode)
+			if res != "" {
+				fmt.Printf("[-]ERC721Token %v not correct\n", file.Name())
+			}
+		}
+	}
+}
+
+func verifyBalanceOfInOneERC721Token(src string) string {
+	const StandardBalanceOfFunction = "function balanceOf(address owner) public view virtual override returns (uint256) {\n        require(owner != address(0), \"ERC721: balance query for the zero address\");\n        return _balances[owner];\n    }"
+	if strings.Contains(src, StandardBalanceOfFunction) {
+		return ""
+	}
+	return "1"
 }

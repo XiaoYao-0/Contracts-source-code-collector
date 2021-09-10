@@ -14,6 +14,7 @@ import (
 )
 
 const ERC20TokenListNoRecord = "Unable to locate any related record"
+const ERC721TokenListNoRecord = "Unable to locate any related record"
 
 type ApiJson struct {
 	Status  string `json:"status"`
@@ -146,9 +147,9 @@ func unmarshal(contract *domain.Contract) error {
 // CollectERC20TokenList Colect top ERC20 Token address list from https://etherscan.io/tokens
 func CollectERC20TokenList() ([]*domain.Contract, error) {
 	re1, _ := regexp.Compile("0x........................................*")
-	re2, _ := regexp.Compile("[(].*[)]")
 	var contractList []*domain.Contract
 	for p := 1; ; p++ {
+		fmt.Printf("ERC20Token p=%v...\n", p)
 		url := fmt.Sprintf("https://etherscan.io/tokens?p=%d", p)
 		doc, err := htmlquery.LoadURL(url)
 		if err != nil {
@@ -163,10 +164,37 @@ func CollectERC20TokenList() ([]*domain.Contract, error) {
 		nodes := htmlquery.Find(doc, "//a[@class='text-primary']")
 		for _, node := range nodes {
 			contract := &domain.Contract{}
-			name := re2.FindString(htmlquery.InnerText(node))
-			contract.Name = name[1 : len(name)-1]
 			href := htmlquery.InnerText(htmlquery.FindOne(node, "//@href"))
 			contract.Address = re1.FindString(href)
+			contract.Name = contract.Address
+			contractList = append(contractList, contract)
+		}
+	}
+}
+
+// CollectERC721TokenList Colect top ERC721 Token address list from https://etherscan.io/tokens-nft
+func CollectERC721TokenList() ([]*domain.Contract, error) {
+	re1, _ := regexp.Compile("0x........................................*")
+	var contractList []*domain.Contract
+	for p := 1; ; p++ {
+		fmt.Printf("ERC721Token p=%v...\n", p)
+		url := fmt.Sprintf("https://etherscan.io/tokens-nft?p=%d", p)
+		doc, err := htmlquery.LoadURL(url)
+		if err != nil {
+			continue
+		}
+		if strings.Contains(htmlquery.InnerText(doc), ERC721TokenListNoRecord) {
+			if len(contractList) == 0 {
+				return contractList, errors.New("no contract address find")
+			}
+			return contractList, nil
+		}
+		nodes := htmlquery.Find(doc, "//a[@class='text-primary']")
+		for _, node := range nodes {
+			contract := &domain.Contract{}
+			href := htmlquery.InnerText(htmlquery.FindOne(node, "//@href"))
+			contract.Address = re1.FindString(href)
+			contract.Name = contract.Address
 			contractList = append(contractList, contract)
 		}
 	}
